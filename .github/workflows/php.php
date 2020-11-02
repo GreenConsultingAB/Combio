@@ -120,7 +120,7 @@
 			
 			
 			
-			$ch = curl_init($baseurl.'/api/resource/Patient/Felixus%20Von%20Troyes');
+			$ch = curl_init($baseurl.'/api/resource/Patient');
 			
 			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 			
@@ -176,35 +176,59 @@
 	 
 
 			}
+			echo '<br><pre>';
+		
+			
+				echo print_r($response)."<br>";
+		
+			echo "</pre></div>";
 			
 			$pdo = new PDO('mysql:dbname=a19majgu_ITORGPROJEKT;host=localhost', 'sqllab', 'Tomten2009');
 			$pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 			
-			echo $response['data']['name'];
 			
 			
+		
+			foreach($response as $blabla){
+					foreach($blabla as $response){
+						print_r($response["name"]);
+							
+							$querystrings='CALL Insertpatient(:name);';
+							$stmt = $pdo->prepare($querystrings);
+							$stmt->bindParam(':name', $response["name"]);	
+							$stmt->execute();  
 			
+							echo "<div style='background-color:lightgray; border:1px solid black'>";
 
+							echo '$response<br><pre>';
+		
+							echo print_r($response)."<br>";
+		
+							echo "</pre></div>";
+							
+					}
+			}
+							$querystrings='SELECT * FROM Patient';
+							$stmt = $pdo->prepare($querystrings);
+						#	$stmt->bindParam(':name', $response["name"]);	
+							$stmt->execute();  
+							echo "<table style='border-collapse:collapse;'><th><tr>namn över personer i vår databas</tr></th>";
+							foreach($stmt as $key => $row){
+							echo "<td>";
+							echo $row['Namn'];
+							echo "</td>";
+							}echo "</table>";
+			
+#foreach ($response["data"]["name"] as ){
 				
 		#
 				#$querystrings='INSERT INTO Patient(Namn) VALUES(:name)  ;'; # Insertpatient(:name);';
 				
-				$querystrings='CALL Insertpatient(:name);';
-				$stmt = $pdo->prepare($querystrings);
-				$stmt->bindParam(':name', $response["data"]["name"]);	
-				$stmt->execute();  
-			
-			echo "<div style='background-color:lightgray; border:1px solid black'>";
-
-			echo '$response<br><pre>';
-		
-				echo print_r($response)."<br>";
-		
-			echo "</pre></div>";
+				
 
 		#echo "INSERT INTO NAMNTABELL (namn) VALUES (".$response["data"]["namn"].");";
 
-
+#}
 	?>
 
 </body>

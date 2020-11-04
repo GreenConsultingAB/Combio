@@ -115,9 +115,7 @@
 
 				
 			debug($response);
-
-		
-				
+	
 			foreach($response as $blabla){
 				foreach($blabla as $response){
 					$namnet =$response['name'];

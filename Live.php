@@ -8,8 +8,14 @@
     <title></title>
 </head>
 <body>
-#testtetetete
 	<?php
+		
+		//Debugger OSCAR.
+		function debug($readMe){
+			'<pre>';
+				print_r($readMe);
+			'</pre>';
+		}
 
 			ini_set('display_errors', 1);
 
@@ -116,79 +122,59 @@
 
 			echo "</pre></div>";
 
+			
+			/*
+			fetchEndPointData funktion skriven av OSCAR:
+			Denna funktion hämtar data ifrån ERPnext. 
+			Detta utförs genom att skicka data för input till en endPoint.
+			Sedan returneras de värden som finns där i en svars 
+			variabel, $respons.
+			*/
+			function fetchEndPointData($baseurl, $cookiepath, $tmeout, $endPoint){
+				
+				$ch = curl_init($baseurl.'/api/resource/'.$endPoint);
+				curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+				curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
+				curl_setopt($ch,CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+				curl_setopt($ch,CURLOPT_COOKIEJAR, $cookiepath);
+				curl_setopt($ch,CURLOPT_COOKIEFILE, $cookiepath);
+				curl_setopt($ch,CURLOPT_TIMEOUT, $tmeout);
+				curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
+				$response = curl_exec($ch);
+				$response = json_decode($response,true);
+				$error_no = curl_errno($ch);
+				$error = curl_error($ch);
+				curl_close($ch);
 
+				if(!empty($error_no)){
 
-
-
-			$ch = curl_init($baseurl.'/api/resource/Patient');
-
-			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-
-
-			curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Accept: application/json'));
-
-			curl_setopt($ch,CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-
-			curl_setopt($ch,CURLOPT_COOKIEJAR, $cookiepath);
-
-			curl_setopt($ch,CURLOPT_COOKIEFILE, $cookiepath);
-
-			curl_setopt($ch,CURLOPT_TIMEOUT, $tmeout);
-
-			curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
-
-
-			$response = curl_exec($ch);
-
-			$response = json_decode($response,true);
-
-
-
-			$error_no = curl_errno($ch);
-
-			$error = curl_error($ch);
-
-			curl_close($ch);
-
-
-
-
-			if(!empty($error_no)){
-
-			  echo "<div style='background-color:red'>";
-
-			  echo '$error_no<br>';
-
-			  var_dump($error_no);
-
-			  echo "<hr>";
-
-
-
-			  echo '$error<br>';
-
-			  var_dump($error);
-
-			  echo "<hr>";
-
-			  echo "</div>";
-
-
-
+				  echo "<div style='background-color:red'>";
+				  echo '$error_no<br>';
+				  var_dump($error_no);
+				  echo "<hr>";
+				  echo '$error<br>';
+				  var_dump($error);
+				  echo "<hr>";
+				  echo "</div>";
+				}
+				echo '<br><pre>';
+					echo print_r($response)."<br>";
+				echo "</pre></div>";
+				
+				return $response;
 			}
-			echo '<br><pre>';
-
-
-				echo print_r($response)."<br>";
-
-			echo "</pre></div>";
-
+			
+			
+			$response=APIendPoint($baseurl, $cookiepath, $tmeout, 'Patient');
+			
 			$pdo = new PDO('mysql:dbname=a19majgu_ITORGPROJEKT;host=localhost', 'sqllab', 'Tomten2009');
 			$pdo->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 
+			
+			debug($response);
 
-
-
+	
+			
 			foreach($response as $blabla){
 					foreach($blabla as $response){
 
@@ -200,8 +186,7 @@
 					}
 			} 
 							$querystrings='SELECT * FROM Patient';
-							$stmt = $pdo->prepare($querystrings);
-						#	$stmt->bindParam(':name', $response["name"]);	
+							$stmt = $pdo->prepare($querystrings);	
 							$stmt->execute();  
 							echo "<table style='border-collapse:collapse;'><th><tr>namn över personer i vår databas</tr></th>";
 							foreach($stmt as $key => $row){
